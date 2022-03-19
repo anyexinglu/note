@@ -12,9 +12,11 @@ class MyPromise {
   status
   resolveCallbacks = []
   rejectCallbacks = []
+
   constructor(callback) {
     this.status = STATUS.PENDING
     let called = false
+
     const resolve = value => {
       if (called) return
       called = true
@@ -27,6 +29,7 @@ class MyPromise {
         })
       })
     }
+
     const reject = reason => {
       if (called) return
       called = true
@@ -39,6 +42,7 @@ class MyPromise {
         })
       })
     }
+
     try {
       callback(resolve, reject)
     } catch (error) {
@@ -46,23 +50,37 @@ class MyPromise {
     }
   }
 
+  // static resolve(val) {
+  //   return new MyPromise((resolve, reject) => {
+  //     resolve(val)
+  //   })
+  // }
+
+  // static reject(val) {
+  //   return new MyPromise((resolve, reject) => {
+  //     // console.error('Uncaught (in promise)', val)
+  //     reject(val)
+  //   })
+  // }
+
   then(onfulfilled, onrejected) {
-    // 解决值穿透
-    onfulfilled = isFunction(onfulfilled)
-      ? onfulfilled
-      : reason => {
-          throw reason
-        }
-    onrejected = isFunction(onrejected)
-      ? onrejected
-      : value => {
-          return value
-        }
+    // if (!)
     const resolveCallbacks = this.resolveCallbacks
     const rejectCallbacks = this.rejectCallbacks
 
     if (this.status === STATUS.PENDING) {
       return new MyPromise((resolve, reject) => {
+        // 解决值穿透
+        onfulfilled = isFunction(onfulfilled)
+          ? onfulfilled
+          : value => {
+              return value
+            }
+        onrejected = isFunction(onrejected)
+          ? onrejected
+          : reason => {
+              throw reason
+            }
         resolveCallbacks.push(innerValue => {
           try {
             const value = onfulfilled(innerValue)
@@ -85,10 +103,19 @@ class MyPromise {
       const innerValue = this.value
       return new MyPromise((resolve, reject) => {
         try {
-          const value = isFullFilled
-            ? onfulfilled(innerValue)
-            : onrejected(innerValue)
-          resolve(value)
+          if (isFullFilled && !isFunction(onfulfilled)) {
+            return resolve(innerValue)
+          }
+          if (!isFullFilled && !isFunction(onrejected)) {
+            return reject(innerValue)
+          }
+          setTimeout(() => {
+            if (isFullFilled) {
+              resolve(onfulfilled(innerValue))
+            } else {
+              reject(onrejected(innerValue))
+            }
+          })
         } catch (e) {
           reject(e)
         }
@@ -110,21 +137,10 @@ class MyPromise {
   all() {}
 }
 
-let p = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    resolve(111)
-  }, 1500)
-})
-
-p.catch(console.log) // 输出 111
-
-let e = new MyPromise((resolve, reject) => {
-  setTimeout(() => {
-    reject(222)
-  }, 1500)
-})
-e.then(console.log) // 打印：Uncaught (in promise) 222
-
-// https://juejin.cn/post/6945319439772434469
+const Reject = (val) => {
+  return new MyPromise((resolver, reject) => {
+       reject(val)
+   })
+}
 
 module.exports = { MyPromise }
