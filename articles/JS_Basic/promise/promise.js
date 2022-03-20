@@ -131,11 +131,19 @@ class MyPromise {
                 if (typeof xThen === 'function') {
                   // 2.3.3.3 If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise
                   const newResolve = y => {
-                    let yThen = y && y.then
-                    if (typeof yThen === 'function') {
-                      yThen.call(y, resolve, reject)
-                    } else {
-                      resolve(y)
+                    let called = false
+                    try {
+                      let yThen = y && y.then
+                      // `y` is a thenable
+                      if (typeof yThen === 'function') {
+                        return yThen.call(y, (val) => { called = true; resolve(val) }, reject)
+                      } else {
+                        resolve(y)
+                      }
+                    } catch(e) {
+                        if (!called) {
+                          reject(e)
+                        }
                     }
                   }
                   return xThen.call(x, newResolve, reject)
