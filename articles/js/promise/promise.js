@@ -110,11 +110,7 @@ class MyPromise {
         }
         setTimeout(() => {
           try {
-            if (isFullFilled) {
-              resolve(onfulfilled(innerValue))
-            } else {
-              resolve(onrejected(innerValue))
-            }
+            resolve(isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue))
           } catch (e) {
             reject(e)
           }
