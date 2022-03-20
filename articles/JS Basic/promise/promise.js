@@ -101,6 +101,7 @@ class MyPromise {
       const isFullFilled = this.status === STATUS.FULFILLED
       const innerValue = this.value
       const newPromise = new MyPromise((resolve, reject) => {
+        // 2.2.1 Both onFulfilled and onRejected are optional arguments
         if (isFullFilled && !isFunction(onfulfilled)) {
           return resolve(innerValue)
         }
@@ -109,20 +110,28 @@ class MyPromise {
         }
         setTimeout(() => {
           try {
-            const result = isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue)
-            if (result === newPromise) {
+            const x = isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue)
+            // 2.3.1 If promise and x refer to the same object, reject promise with a TypeError as the reason.
+            if (x === newPromise) {
               reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
             }
-            if (result instanceof MyPromise) {
-              if (result.status === STATUS.FULFILLED) {
-                resolve(result.value)
-              } else if (result.status === STATUS.REJECTED) {
-                reject(result.value)
+            // 2.3.2 If x is a promise, adopt its state.
+            if (x instanceof MyPromise) {
+              if (x.status === STATUS.FULFILLED) {
+                resolve(x.value)
+              } else if (x.status === STATUS.REJECTED) {
+                reject(x.value)
               } else {
-                result.then(resolve, reject)
+                x.then(resolve, reject)
               }
             } else {
-              resolve(result)
+              if (['object', 'function'].includes(typeof x)) {
+                let xThen = x.then
+                if (typeof xThen === 'function') {
+                  xThen(resolve, reject)
+                }
+              }
+              resolve(x)
             }
           } catch (e) {
             reject(e)
