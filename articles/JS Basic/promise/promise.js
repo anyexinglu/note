@@ -129,7 +129,9 @@ class MyPromise {
               if (['object', 'function'].includes(typeof x)) {
                 let xThen = x.then
                 if (typeof xThen === 'function') {
-                  xThen(resolve, reject)
+                  // 2.3.3.3 If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise
+                  xThen.call(x, resolve, reject)
+                  return
                 }
               }
               resolve(x)
