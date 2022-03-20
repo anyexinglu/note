@@ -136,7 +136,10 @@ class MyPromise {
                       let yThen = y && y.then
                       // `y` is a thenable
                       if (typeof yThen === 'function') {
-                        return yThen.call(y, (val) => { called = true; resolve(val) }, reject)
+                        return yThen.call(y, (val) => { 
+                          !called && newResolve(val)
+                          called = true;
+                         }, reject)
                       } else {
                         resolve(y)
                       }
