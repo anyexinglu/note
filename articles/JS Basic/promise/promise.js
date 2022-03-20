@@ -64,7 +64,6 @@ class MyPromise {
   // }
 
   then(onfulfilled, onrejected) {
-    // if (!)
     const resolveCallbacks = this.resolveCallbacks
     const rejectCallbacks = this.rejectCallbacks
 
@@ -101,7 +100,7 @@ class MyPromise {
     } else {
       const isFullFilled = this.status === STATUS.FULFILLED
       const innerValue = this.value
-      return new MyPromise((resolve, reject) => {
+      const newPromise = new MyPromise((resolve, reject) => {
         if (isFullFilled && !isFunction(onfulfilled)) {
           return resolve(innerValue)
         }
@@ -110,12 +109,27 @@ class MyPromise {
         }
         setTimeout(() => {
           try {
-            resolve(isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue))
+            const result = isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue)
+            if (result === newPromise) {
+              reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
+            }
+            if (result instanceof MyPromise) {
+              if (result.status === STATUS.FULFILLED) {
+                resolve(result.value)
+              } else if (result.status === STATUS.REJECTED) {
+                reject(result.value)
+              } else {
+                result.then(resolve, reject)
+              }
+            } else {
+              resolve(result)
+            }
           } catch (e) {
             reject(e)
           }
         })
       })
+      return newPromise
     }
   }
 
