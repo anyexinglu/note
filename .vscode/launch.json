@@ -36,7 +36,7 @@
       "internalConsoleOptions": "neverOpen"
     },
     {
-      "command": "cd articles/js/promise && yarn test",
+      "command": "cd articles/JS_Basic/promise && yarn test",
       "name": "yarn test",
       "request": "launch",
       "type": "node-terminal"
