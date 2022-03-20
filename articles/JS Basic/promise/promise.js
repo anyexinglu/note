@@ -125,6 +125,7 @@ class MyPromise {
                 x.then(resolve, reject)
               }
             } else {
+              // 2.3.3 Otherwise, if x is an object or function.
               if (['object', 'function'].includes(typeof x)) {
                 let xThen = x.then
                 if (typeof xThen === 'function') {
