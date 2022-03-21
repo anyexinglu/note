@@ -50,18 +50,17 @@ class MyPromise {
     }
   }
 
-  // static resolve(val) {
-  //   return new MyPromise((resolve, reject) => {
-  //     resolve(val)
-  //   })
-  // }
+  static resolve(val) {
+    return new MyPromise((resolve, reject) => {
+      resolve(val)
+    })
+  }
 
-  // static reject(val) {
-  //   return new MyPromise((resolve, reject) => {
-  //     // console.error('Uncaught (in promise)', val)
-  //     reject(val)
-  //   })
-  // }
+  static reject(val) {
+    return new MyPromise((resolve, reject) => {
+      reject(val)
+    })
+  }
 
   then(onfulfilled, onrejected) {
     const resolveCallbacks = this.resolveCallbacks
@@ -129,7 +128,7 @@ class MyPromise {
             } else {
               // 2.3.3 Otherwise, if x is an object or function.
               if (['object', 'function'].includes(typeof x)) {
-                let xThen = x.then
+                let xThen = x && x.then
                 if (typeof xThen === 'function') {
                   // 2.3.3.3 If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise
                   const newResolve = (y, deep = 0) => {
@@ -190,18 +189,6 @@ class MyPromise {
   }
 
   all() {}
-}
-
-const Reject = (val) => {
-  return new MyPromise((resolve, reject) => {
-       reject(val)
-   })
-}
-
-const Resolve = (val) => {
-  return new MyPromise((resolve, reject) => {
-      resolve(val)
-   })
 }
 
 module.exports = { MyPromise }
