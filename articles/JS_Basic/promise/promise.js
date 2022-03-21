@@ -109,6 +109,8 @@ class MyPromise {
           return reject(innerValue)
         }
         setTimeout(() => {
+          let statusGot = false
+
           try {
             const x = isFullFilled ? onfulfilled(innerValue) : onrejected(innerValue)
             // 2.3.1 If promise and x refer to the same object, reject promise with a TypeError as the reason.
@@ -129,11 +131,13 @@ class MyPromise {
               if (['object', 'function'].includes(typeof x)) {
                 let xThen = x.then
                 if (typeof xThen === 'function') {
-                  let statusGot = false
                   // 2.3.3.3 If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise
-                  const newResolve = y => {
+                  const newResolve = (y, deep = 0) => {
                     let called = false
-                    // if (!statusGot) {
+                    if (statusGot && deep === 0) {
+                      return
+                    }
+                    statusGot = true
                     try {
                       let yThen = y && y.then
                       // `y` is a thenable
@@ -142,7 +146,7 @@ class MyPromise {
                           // `y` is a thenable that tries to fulfill twice
                           if (!called) {
                             called = true;
-                            newResolve(val)
+                            newResolve(val, deep + 1)
                           }
                         }, reject)
                       } else {
@@ -152,14 +156,12 @@ class MyPromise {
                       // 如果 yThen 先 resolve 再抛异常，则忽略（静默）该异常，否则 reject 异常。
                       !called && reject(e)
                     }
-                    statusGot = true
-                    // }
                   }
                   const newReject = e => {
                     // reject(e)
                     if (!statusGot) {
-                      reject(e)
                       statusGot = true
+                      reject(e)
                     }
                   }
                   return xThen.call(x, newResolve, newReject)
@@ -168,7 +170,7 @@ class MyPromise {
               resolve(x)
             }
           } catch (e) {
-            reject(e)
+            !statusGot && reject(e)
           }
         })
       })
