@@ -129,27 +129,40 @@ class MyPromise {
               if (['object', 'function'].includes(typeof x)) {
                 let xThen = x.then
                 if (typeof xThen === 'function') {
+                  let statusGot = false
                   // 2.3.3.3 If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise
                   const newResolve = y => {
                     let called = false
+                    // if (!statusGot) {
                     try {
                       let yThen = y && y.then
                       // `y` is a thenable
                       if (typeof yThen === 'function') {
-                        return yThen.call(y, (val) => { 
-                          !called && newResolve(val)
-                          called = true;
-                         }, reject)
+                        yThen.call(y, (val) => { 
+                          // `y` is a thenable that tries to fulfill twice
+                          if (!called) {
+                            called = true;
+                            newResolve(val)
+                          }
+                        }, reject)
                       } else {
                         resolve(y)
                       }
                     } catch(e) {
-                        if (!called) {
-                          reject(e)
-                        }
+                      // 如果 yThen 先 resolve 再抛异常，则忽略（静默）该异常，否则 reject 异常。
+                      !called && reject(e)
+                    }
+                    statusGot = true
+                    // }
+                  }
+                  const newReject = e => {
+                    // reject(e)
+                    if (!statusGot) {
+                      reject(e)
+                      statusGot = true
                     }
                   }
-                  return xThen.call(x, newResolve, reject)
+                  return xThen.call(x, newResolve, newReject)
                 }
               }
               resolve(x)
