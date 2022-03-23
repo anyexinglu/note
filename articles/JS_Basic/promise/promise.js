@@ -24,6 +24,10 @@ class MyPromise {
       this.status = STATUS.FULFILLED
 
       setTimeout(() => {
+        // if (this.resolveCallbacks.length > 1) {
+        //   debugger
+        //   console.log(this.resolveCallbacks)
+        // }
         this.resolveCallbacks.forEach(cb => {
           cb(this.value)
         })
