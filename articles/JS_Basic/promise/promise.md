@@ -52,7 +52,7 @@ PromiseAll = fns => {
         const results = []
         fns.forEach((fn) => {
             Promise.resolve(fn).then(res => {
-                results.push(res)
+                results[i] = res
                 if (results.length === fns.length) resolve(result)
             }).catch(error => {
                 reject(error)
