@@ -165,6 +165,8 @@ caught on main: 111!
 
 更多细节，详见：[Node.js内部是如何捕获异步错误的？](https://zhuanlan.zhihu.com/p/62210238)。
 
+理解微任务宏任务：[jsv9000](https://www.jsv9000.app/?continueFlag=c5873e6868c78e95e688cf10f05ff5fb)
+
 </p>
 </details>
 
