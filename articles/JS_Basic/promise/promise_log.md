@@ -20,7 +20,30 @@ Uncaught (in promise) 111
 </details>
 <br/>
 
-#### 2、以下几个 case 分别输出什么？
+#### 2、以下输出什么？
+
+```js
+await Promise.reject('111')
+console.log(222)
+```
+
+<details><summary><b>Answer</b></summary>
+<p>
+
+```
+Uncaught 111 // console.log(222) 不会执行
+```
+如果去掉 await 呢？
+
+```
+222
+Uncaught (in promise) 111
+```
+</p>
+</details>
+<br/>
+
+#### 3、以下几个 case 分别输出什么？
 
 ```js
 // case 1
@@ -61,7 +84,7 @@ Uncaught Error: 111
 </details>
 <br/>
 
-#### 3、输出什么？
+#### 4、输出什么？
 
 ```js
 async function fn () {
@@ -84,7 +107,7 @@ Uncaught Error: 111
 </details>
 <br/>
 
-#### 4、输出什么？
+#### 5、输出什么？
 
 ```js
 // window 环境下：
@@ -145,7 +168,7 @@ caught on main: 111!
 </p>
 </details>
 
-#### 5、输出什么？
+#### 6、输出什么？
 
 ```js
 window.addEventListener("unhandledrejection", event => {
@@ -184,7 +207,7 @@ caught inside main: 111
 </p>
 </details>
 
-#### 6、输出什么？
+#### 7、输出什么？
 
 ```js
 Promise.resolve().then(() => console.log('p1'))
