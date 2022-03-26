@@ -87,6 +87,17 @@ Uncaught Error: 111
 #### 4、输出什么？
 
 ```js
+// window 环境下：
+// window.addEventListener("unhandledrejection", event => {
+//   console.warn(`unhandledRejection: ${event.reason.message}`);
+// });
+  
+// node 环境下：
+const process = require('process')
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', 'reason:', reason)
+})
+
 async function main() {
   const p1 = Promise.reject(new Error("111!")); 
   await Promise.resolve();  // 这行代码，注意
@@ -109,11 +120,12 @@ caught on main: 111!
 
 题目中的 `await Promise.resolve();  // 这行代码，注意`，分别改成以下，按顺序输出什么？
 
-```
+```js
+
 await Promise.resolve(r => queueMicrotask(r));
 await new Promise(r => process.nextTick(r));
 await new Promise(r => setTimeout(r, 0));
-await new Promise(r => setImmediate(r, 0))
+await new Promise(r => setImmediate(r, 0));
 ```
 
 <details><summary><b>Answer</b></summary>
@@ -122,10 +134,13 @@ await new Promise(r => setImmediate(r, 0))
 ```
 caught on main: 111!
 caught on main: 111!
-Uncaught (in promise) Error: 111!
-Uncaught (in promise) Error: 111!
+先是 Unhandled Rejection at: reason: Error: 111! 然后 Uncaught (in promise) Error: 111!
+先是 Unhandled Rejection at: reason: Error: 111! 然后 Uncaught (in promise) Error: 111!
 ```
-为什么？因为前两个是微任务，后两个是宏任务。
+每次 Tick 完成后，会触发 Tick 的回调，检查是不是有未处理的错误的 Promise，如果有，则会触发 unhandledRejection 事件。
+而微任务都是 Tick 没执行完就由 main catch 住，所以没到 unhandledRejection。
+
+更多细节，详见：[Node.js内部是如何捕获异步错误的？](https://zhuanlan.zhihu.com/p/62210238)。
 
 </p>
 </details>
@@ -196,6 +211,6 @@ t3
 p3
 unhandledRejection
 ```
-
+每次 Tick 完成后，会执行并清空 Tock 队列，然后检查有没有异步错误，再触发 unhandledRejection 事件的回调。也就是说 unhandledRejection 的回调是在 Tick 和 Tock 队列都被清空之后进行。
 </p>
 </details>
