@@ -1,4 +1,26 @@
-#### 1、以下几个 case 分别输出什么？
+#### 1、以下输出什么？
+
+```js
+try {
+    Promise.reject('111')
+} catch(err) {
+    console.log(err)
+}
+```
+
+<details><summary><b>Answer</b></summary>
+<p>
+
+```
+Uncaught (in promise) 111
+```
+啥都 catch 不到。所以要用 promise 的 catch。
+如果在 promise.reject 前加上 await 呢？那就会 catch 到（输出 111）。
+</p>
+</details>
+<br/>
+
+#### 2、以下几个 case 分别输出什么？
 
 ```js
 // case 1
@@ -39,7 +61,7 @@ Uncaught Error: 111
 </details>
 <br/>
 
-#### 2、输出什么？
+#### 3、输出什么？
 
 ```js
 async function fn () {
@@ -62,7 +84,7 @@ Uncaught Error: 111
 </details>
 <br/>
 
-#### 3、输出什么？
+#### 4、输出什么？
 
 ```js
 async function main() {
@@ -108,7 +130,7 @@ Uncaught (in promise) Error: 111!
 </p>
 </details>
 
-#### 4、输出什么？
+#### 5、输出什么？
 
 ```js
 window.addEventListener("unhandledrejection", event => {
@@ -142,6 +164,37 @@ main().catch(e => console.warn(`caught on main: ${e.message}`));
 
 ```
 caught inside main: 111
+```
+
+</p>
+</details>
+
+#### 6、输出什么？
+
+```js
+Promise.resolve().then(() => console.log('p1'))
+Promise.reject()
+Promise.resolve().then(() => {
+    console.log('p2');
+    process.nextTick(() => {
+        console.log('t3')
+        Promise.resolve().then(() => console.log('p3'))
+    })
+})
+process.on('unhandledRejection', () => {
+    console.log('unhandledRejection')
+})
+```
+
+<details><summary><b>Answer</b></summary>
+<p>
+
+```
+p1
+p2
+t3
+p3
+unhandledRejection
 ```
 
 </p>
