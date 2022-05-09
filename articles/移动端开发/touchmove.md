@@ -56,9 +56,17 @@ getEventListeners($element) 得到的 touchmove 数组多了一项：`[{useCaptu
 
 Event 接口的 stopPropagation() 方法阻止捕获和冒泡阶段中当前事件的进一步传播。但是，它不能防止任何默认行为的发生（默认行为要通过 preventDefault() 方法阻止）。
 
-### targetTouches
+### TouchEvent.targetTouches
 
-targetTouches.length 不等于 1，表示多指。
+[targetTouches MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/TouchEvent/targetTouches)
+
+TouchEvent.targetTouches.length 不等于 1，表示多指。
+
+### Event.isTrusted
+
+(isTrusted MDN)[https://developer.mozilla.org/zh-CN/docs/Web/API/Event/isTrusted]
+
+Event 接口的 isTrusted 属性是一个只读属性，它是一个布尔值（Boolean (en-US)）。当事件是由用户行为生成的时候，这个属性的值为 true ，而当事件是由脚本创建、修改、通过 EventTarget.dispatchEvent() 派发的时候，这个属性的值为 false 。
 
 ### addEventListener 和 onxxx
 
