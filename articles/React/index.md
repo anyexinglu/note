@@ -1,3 +1,7 @@
+## 渲染方式
+
+### 流式渲染
+
 
 ## React 17 改变了什么
 [React 17](https://reactjs.org/blog/2020/10/20/react-v17.html)
