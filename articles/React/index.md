@@ -1,3 +1,18 @@
+## React Fiber
+
+
+在 React15 及以前，Reconciler 采用递归的方式创建虚拟 DOM，递归过程是不能中断的。如果组件树的层级很深，递归会占用线程很多时间，造成卡顿。
+为了解决这个问题，React16 将递归的无法中断的更新重构为异步的可中断更新，由于曾经用于递归的虚拟 DOM 数据结构已经无法满足需要。于是，全新的 Fiber 架构应运而生。
+
+
+Fiber 包含三层含义：
+
+- 作为架构来说，之前 React15 的 Reconciler 采用递归的方式执行，数据保存在递归调用栈中，所以被称为 stack Reconciler。React16 的 Reconciler 基于 Fiber 节点实现，被称为 Fiber Reconciler。
+- 作为静态的数据结构来说，每个 Fiber 节点对应一个 React element，保存了该组件的类型（函数组件/类组件/原生组件...）、对应的 DOM 节点等信息。
+- 作为动态的工作单元来说，每个 Fiber 节点保存了本次更新中该组件改变的状态、要执行的工作（需要被删除/被插入页面中/被更新...）。
+
+
+
 ## 渲染方式
 
 ### 流式渲染
@@ -6,7 +21,7 @@
 ## React 17 改变了什么
 [React 17](https://reactjs.org/blog/2020/10/20/react-v17.html)
 
-### 事件机制
+### 1、事件机制
 
 ```js
 const rootNode = document.getElementById('root');
@@ -16,7 +31,7 @@ React 16 及之前, React 会通过 document.addEventListener() 挂载事件，�
 
 ![](./event.jpg)
 
-### 新的 JSX transform
+### 2、新的 JSX transform
 
 这段 jsx：
 ```jsx

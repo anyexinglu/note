@@ -1,7 +1,7 @@
 // 比如有 100 个任务，需要并发执行（请求接口），最多 5 个，一个完成后安排下一个。
 // 当 allTasks 有任务执行完毕后，自动补充任务，始终保持正在执行的任务有 `limitCount`个
 
-// v1 版本
+// v1 版本（这个版本不满足要求，该版本是五个一起，不是一个个自动补上）
 function parallel(allTasks, limitCount) {
   const firstBatchTasks = allTasks.slice(0, limitCount)
   const restBatchTasks = allTasks.slice(limitCount)

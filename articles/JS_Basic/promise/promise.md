@@ -50,10 +50,12 @@ PromiseAll = fns => {
 PromiseAll = fns => {
     return new Promise((resolve, reject) => {
         const results = []
-        fns.forEach((fn) => {
+        let count = 0
+        fns.forEach((fn, i) => {
             Promise.resolve(fn).then(res => {
                 results[i] = res
-                if (results.length === fns.length) resolve(result)
+                count++
+                if (count === fns.length) resolve(results)
             }).catch(error => {
                 reject(error)
             })
@@ -178,6 +180,7 @@ PromiseAllSettled = fns => {
 // 方法二：不使用 async await
 PromiseAllSettled = fns => {
   const results = []
+  let count = 0
   return new Promise((resolve, reject) => {
     for (let i = 0; i < fns.length; i++) {
         fns[i].then(result => {
@@ -185,7 +188,8 @@ PromiseAllSettled = fns => {
                 status: 'fulfilled',
                 value: result
             })
-            if (results.length === fns.length) {
+            count++
+            if (count === fns.length) {
                 resolve(results)
             }
         }).catch(e => {
@@ -194,7 +198,8 @@ PromiseAllSettled = fns => {
                 status: 'rejected',
                 reason: e
             })
-            if (results.length === fns.length) {
+            count++
+            if (count === fns.length) {
                 resolve(results)
             }
         })
