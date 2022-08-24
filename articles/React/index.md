@@ -11,6 +11,11 @@ Fiber 包含三层含义：
 - 作为静态的数据结构来说，每个 Fiber 节点对应一个 React element，保存了该组件的类型（函数组件/类组件/原生组件...）、对应的 DOM 节点等信息。
 - 作为动态的工作单元来说，每个 Fiber 节点保存了本次更新中该组件改变的状态、要执行的工作（需要被删除/被插入页面中/被更新...）。
 
+浏览器下使用 react-dom 的渲染器，进行两个阶段：
+
+- reconcile 阶段（由 scheducler 调度执行）：会先把 vdom 转成 fiber，找到需要更新 dom 的部分，打上增删改的 effectTag 标记，这个过程可以打断。
+- commit 阶段：reconcile 结束之后一次性根据 effectTag 更新 dom，叫做 commit。
+
 diff 算法：
 
 > [图解 React 的 diff 算法：核心就两个字 —— 复用](https://mp.weixin.qq.com/s?__biz=Mzg3OTYzMDkzMg==&mid=2247491451&idx=1&sn=4a42b0ffe40cd88c5bc9a602bf98ed5c&chksm=cf00d040f8775956ff098a4a055090f56d3ce55cb95701742f5a996754895faa5fdcf73f621c&scene=132#wechat_redirect)
@@ -18,6 +23,13 @@ diff 算法：
 其实 SSR 的时候就不用做 diff，每次都是 vdom 渲染出新的字符串，第二次渲染也是产生字符串，并不会和之前的字符串对比下，有哪些字符串可以复用。
 
 那为什么浏览器里要做 diff 呢？因为 dom 创建的性能成本很高，如果不做 dom 的复用，那前端框架的性能就太差了。diff 算法的目的就是对比两次渲染结果，找到可复用的部分，然后剩下的该删除删除，该新增新增。
+
+react 的 diff 算法分为两个阶段：
+
+- 第一个阶段一一对比，如果可以复用就下一个，不可以复用就结束。
+- 第二个阶段把剩下的老 fiber 放到 map 里，遍历剩余的 vdom，一一查找 map 中是否有可复用的节点。
+
+最后把剩下的老 fiber 删掉，剩下的新 vdom 新增，这样就完成了更新时的 reconcile 过程。
 
 ## 渲染方式
 
