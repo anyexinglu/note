@@ -1,9 +1,7 @@
 ## React Fiber
 
-
 在 React15 及以前，Reconciler 采用递归的方式创建虚拟 DOM，递归过程是不能中断的。如果组件树的层级很深，递归会占用线程很多时间，造成卡顿。
 为了解决这个问题，React16 将递归的无法中断的更新重构为异步的可中断更新，由于曾经用于递归的虚拟 DOM 数据结构已经无法满足需要。于是，全新的 Fiber 架构应运而生。
-
 
 Fiber 包含三层含义：
 
@@ -11,25 +9,72 @@ Fiber 包含三层含义：
 - 作为静态的数据结构来说，每个 Fiber 节点对应一个 React element，保存了该组件的类型（函数组件/类组件/原生组件...）、对应的 DOM 节点等信息。
 - 作为动态的工作单元来说，每个 Fiber 节点保存了本次更新中该组件改变的状态、要执行的工作（需要被删除/被插入页面中/被更新...）。
 
-浏览器下使用 react-dom 的渲染器，进行两个阶段：
+## React diff 算法
 
-- reconcile 阶段（由 scheducler 调度执行）：会先把 vdom 转成 fiber，找到需要更新 dom 的部分，打上增删改的 effectTag 标记，这个过程可以打断。
-- commit 阶段：reconcile 结束之后一次性根据 effectTag 更新 dom，叫做 commit。
+[The Diffing Algorithm](https://reactjs.org/docs/reconciliation.html#the-diffing-algorithm)
 
-diff 算法：
+### 1、Elements Of Different Types
 
-> [图解 React 的 diff 算法：核心就两个字 —— 复用](https://mp.weixin.qq.com/s?__biz=Mzg3OTYzMDkzMg==&mid=2247491451&idx=1&sn=4a42b0ffe40cd88c5bc9a602bf98ed5c&chksm=cf00d040f8775956ff098a4a055090f56d3ce55cb95701742f5a996754895faa5fdcf73f621c&scene=132#wechat_redirect)
+如下，div 变成 span，Counter 也会销毁重建：
 
-其实 SSR 的时候就不用做 diff，每次都是 vdom 渲染出新的字符串，第二次渲染也是产生字符串，并不会和之前的字符串对比下，有哪些字符串可以复用。
+```js
+<div>
+  <Counter />
+</div>
 
-那为什么浏览器里要做 diff 呢？因为 dom 创建的性能成本很高，如果不做 dom 的复用，那前端框架的性能就太差了。diff 算法的目的就是对比两次渲染结果，找到可复用的部分，然后剩下的该删除删除，该新增新增。
+<span>
+  <Counter />
+</span>
+```
+### 2、DOM Elements Of The Same Type
 
-react 的 diff 算法分为两个阶段：
+修改 className 或者 style，只会重新渲染。
 
-- 第一个阶段一一对比，如果可以复用就下一个，不可以复用就结束。
-- 第二个阶段把剩下的老 fiber 放到 map 里，遍历剩余的 vdom，一一查找 map 中是否有可复用的节点。
+### 3、Component Elements Of The Same Type
 
-最后把剩下的老 fiber 删掉，剩下的新 vdom 新增，这样就完成了更新时的 reconcile 过程。
+同一个，只会 rerender
+
+[React 源码剖析系列 － 不可思议的 react diff](https://zhuanlan.zhihu.com/p/20346379)
+
+### 1、tree diff
+
+当出现节点跨层级移动时，并不会出现想象中的移动操作，而是以 A 为根节点的树被整个重新创建，这是一种影响 React 性能的操作，因此 React 官方建议不要进行 DOM 节点跨层级的操作。
+
+所以在开发组件时，保持稳定的 DOM 结构会有助于性能的提升。例如，可以通过 CSS 隐藏或显示节点，而不是真的移除或添加 DOM 节点。
+
+### 2、component diff
+
+如果是同一类型的组件，按照原策略继续比较 virtual DOM tree。
+
+如果不是，则将该组件判断为 dirty component，从而替换整个组件下的所有子节点。
+
+对于同一类型的组件，有可能其 Virtual DOM 没有任何变化，如果能够确切的知道这点那可以节省大量的 diff 运算时间，因此 React 允许用户通过 shouldComponentUpdate() 来判断该组件是否需要进行 diff。
+
+### 3、element diff
+
+当节点处于同一层级时，React diff 提供了三种节点操作，分别为：INSERT_MARKUP（插入）、MOVE_EXISTING（移动）和 REMOVE_NODE（删除）。
+
+例如，老集合中包含节点：A、B、C、D，更新后的新集合中包含节点：B、A、D、C，此时新老集合进行 diff 差异化对比，发现 B != A，则创建并插入 B 至新集合，删除老集合 A；以此类推，创建并插入 A、D 和 C，删除 B、C 和 D。
+
+针对这一繁琐冗余的现象，React 提出优化策略：允许开发者对同一层级的同组子节点，添加唯一 key 进行区分，虽然只是小小的改动，性能上却发生了翻天覆地的变化。
+
+（1）新老集合中存在相同节点但位置不同时，对节点进行位置移动的情况
+
+![](./key-move.png)
+
+> B、D 往前移，不需要移动，A、C 往后移，需要移动
+
+B：新集合中 B._mountIndex = 0，更新 `lastIndex = Math.max(prevChild._mountIndex, lastIndex)`，prevChild._mountIndex 表示 B 在老集合中的位置即 1，所以 lastIndex = 1。
+
+A：A 在老集合中的位置 A._mountIndex = 0，满足 `child._mountIndex（0）< lastIndex（1）` 的条件，需对 A 进行移动操作 `enqueueMove(this, child._mountIndex, toIndex)`， toIndex 是 A 需要移动到的位置（nextIndex）为 1。更新 lastIndex = Math.max(prevChild._mountIndex, lastIndex) ＝ 1。
+
+D：同 B，不满足 child._mountIndex（3）< lastIndex（1）的条件，因此不对 D 进行移动操作。更新 lastIndex ＝ 3（因为 D 在老集合中的位置 D._mountIndex = 3）。
+
+C：同 A，满足 child._mountIndex（2） < lastIndex（3）的条件，移动操作，更新 lastIndex ＝ 3。
+
+（2）新集合中有新加入的节点且老集合存在需要删除的节点
+
+
 
 ## 渲染方式
 
