@@ -33,7 +33,7 @@ function AClient(props) {
 function App() {
   return (
     <AClient>
-      <BServer>
+      <BServer />
     </AClient>
   )
 }
