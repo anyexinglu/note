@@ -1,12 +1,11 @@
 
 ## 约束
 
-Client component 不能直接用 server component，但可以作为 children props 使用：
+Client component 不能直接用 Server component，但可以作为 children props 使用：
 
 错误写法：
 
 ```tsx
-// 
 function AClient() {
   return (
     <div>
