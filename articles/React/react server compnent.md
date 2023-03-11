@@ -38,3 +38,5 @@ function App() {
   )
 }
 ```
+
+主要原因是：如果 AClient 自身 state 变化触发 rerender，错误写法中，BServer 势必因此 rerender（这样 server 组件也成了 client 组件了）。正确写法中，只有 App rerender 才会触发 BServer rerender。
