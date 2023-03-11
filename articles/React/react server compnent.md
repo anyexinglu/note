@@ -9,7 +9,7 @@ Client component 不能直接用 Server component，但可以作为 children pro
 function AClient() {
   return (
     <div>
-      <BServer>
+      <BServer />
       xxx
     </div>
   )
