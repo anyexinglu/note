@@ -70,7 +70,27 @@ function App() {
 
 回答：
 
-（1）我们目前还未支持任意的延迟渲染，未来会支持。最常见的实现方式（但更受限制）是 route navigations，比如切换一个标签，router 重新请求 RSC 树的一片段。
+我们目前还未支持任意的延迟渲染，未来会支持。最常见的实现方式（但更受限制）是 route navigations，比如切换一个标签，router 重新请求 RSC 树的一片段。
 
 > makes sense. we don’t have built-in support for arbitrary lazy rendering yet. would need to add in the future. the most common case (but more limited) is route navigations. like changing a tab. for that, the router requests a part of RSC tree for the refetched segment.
+
+3、提问：我正在开始一个新建项目，并试图在 Remix 和 Next 之间做出决定。你所描述的让我觉得我可能也不需要。这样说公平吗？
+
+[Question: say I want to use an RSC <Tweet /> component. But I only want to show it to the user after a client-side interaction occurred - say inside a tooltip when hovering over some text. I know with Next this is done via the router segments but it's unclear *how* it's done](https://twitter.com/lmatteis/status/1633581263817789447)
+
+回答：
+
+我认为 Remix 和 Next 都是今天非常好的选择。至于 RSC，它更面向未来，但您可以在 Next 13 beta app router 中尝试。
+
+> I think both Remix and Next are really good options today. as for RSC it’s a bit more future-oriented but you can try it in Next 13 beta app router.
+[Try RSC in Next 13 beta app router](https://twitter.com/dan_abramov/status/1632058882720776195)
+
+
+TODO 
+
+https://twitter.com/dan_abramov/status/1633574036767662080
+
+Upvote for state machine
+
+ [ask me anything about React Server Components](https://twitter.com/dan_abramov/status/1631641431742857216)
 
