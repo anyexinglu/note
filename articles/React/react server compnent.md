@@ -94,3 +94,6 @@ Upvote for state machine
 
  [ask me anything about React Server Components](https://twitter.com/dan_abramov/status/1631641431742857216)
 
+## 相关文章
+
+[【第2914】从Next.js 13 认识React Server Components](https://mp.weixin.qq.com/s/1_Fh8fxOLF2zu_cRA5dobQ)
