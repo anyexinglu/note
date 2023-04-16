@@ -108,6 +108,8 @@ this is the inner next tick inside Promise then block
 
 也就是微队列中，会先执行 nextTick 队列，直到为空，才会执行 Promise 队列。
 
+更详细的解释可以见下一篇，event_loop2.md
+
 2、执行代码
 
 ```js
@@ -177,3 +179,10 @@ inner this is Promise.resolve 2
 this is setTimeout 3
 inner this is Promise.resolve 3
 ```
+验证了：
+
+- 1、Any callbacks in the microtask queue are executed. First, tasks in the nextTick queue and only then tasks in the promise queue.
+- 2、All callbacks within the timer queue are executed.
+- 3、Callbacks in the microtask queue (if present) are executed after every callback in the timer queue. First, tasks in the nextTick queue, and then tasks in the promise queue.
+
+注意第 3 点中说的，"Callbacks in the microtask queue (if present) are executed after every callback in the timer queue"，所以 this is setTimeout 2 之后不会马上执行 this is setTimeout 3，而是先执行 inner this is Promise.resolve 2。
