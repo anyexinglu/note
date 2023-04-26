@@ -165,7 +165,18 @@ function* stateMachine() {
 
 const sm = stateMachine();
 
-console.log(sm.next().value); // Enter start state
-console.log(sm.next('middle').value); // Enter middle state
-console.log(sm.next('end').value); // Enter end state
+console.log(sm.next().value); 
+console.log(sm.next('middle').value); // 通过 state = yield 'start' 返回 start 并且 将 state 修改成了 middle
+console.log(sm.next('end').value);
+```
+
+输出结果为：（原文输出结果有误）
+
+```js
+Enter start state
+start
+Enter middle state
+middle
+Enter end state
+end
 ```
