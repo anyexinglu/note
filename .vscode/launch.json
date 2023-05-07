@@ -4,8 +4,9 @@
   // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
-      "command": "cd articles/JS_Basic/promise && yarn test",
+      "command": "cd /Users/yangxiayan/Downloads && node deepClone",
       "name": "yarn test",
       "request": "launch",
       "type": "node-terminal"
