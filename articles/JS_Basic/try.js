@@ -1,23 +1,26 @@
-// https://juejin.cn/post/7061588533214969892#heading-41
-
-function Car(make, model, year) {
-  this.make = make;
-  this.model = model;
-  this.year = year;
+function debounce(fn, delay) {
+  let timer = null;
+  console.log('this1', this, this.name);
+  return function() {
+    let context = this,
+      args = arguments;
+    console.log('this2',  this,this.name);
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+       console.log('this3', this, this.name);
+       fn.apply(context, args);
+      //  fn(...args);
+    }, delay);
+  }
 }
 
-function newOperator(self, ...args) {
-    if (typeof self !== 'function') {
-        return console.error('type error')
-    }
-    const obj = new Object();
-    obj.__proto__ = self.prototype;
-
-    const result = self.apply(obj, args)
-    return result && (typeof result === 'object' || typeof result === 'function') ? result : obj
+// 试验：
+let person = {
+  name: 'John',
+  age: 23,
+  getName: debounce(function() {
+    console.log(this, this.name); // Timeout undefined
+  }, 50)
 }
-// 验证
-// newOperator(构造函数，初始化参数) 如：
-x = newOperator(Car, 'Eagle', 'Talon TSi', 1993);   // 获到 Car {make: 'Eagle', model: 'Talon TSi', year: 1993}
-
-console.log(x)
+person.getName();
+person.getName();
