@@ -6,7 +6,7 @@
   "configurations": [
 
     {
-      "command": "cd /Users/yangxiayan/Downloads && node deepClone",
+      "command": "cd /Users/baoerjie/Documents/duoduo/note && node articles/JS_Basic/try.js",
       "name": "yarn test",
       "request": "launch",
       "type": "node-terminal"
