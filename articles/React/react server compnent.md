@@ -41,6 +41,20 @@ function App() {
 
 主要原因是：如果 AClient 自身 state 变化触发 rerender，错误写法中，BServer 势必因此 rerender（这样 server 组件也成了 client 组件了）。正确写法中，只有 App rerender 才会触发 BServer rerender。
 
+## [Why do Client Components get SSR'd to HTML?](https://github.com/reactwg/server-components/discussions/4)
+
+![](https://user-images.githubusercontent.com/810438/242760351-01971cfa-6e3a-4077-bb09-7d2a2c21e51c.png)
+
+One way to think about it is that in RSC, "Server" and "Client" doesn't directly correspond to a physical server and client. You can think of them more as "React Server" and "React Client". Props always flow from React Server to React Client, and there is a serialization boundary between them. React Server typically runs either at the build time (default), or on an actual server. React Client typically runs in both environments (in the browser it manages the DOM, in other environments it generates initial HTML).
+
+在 RSC 中，“Server” 和 “Client” 并不直接对应物理的服务器和客户端。你可以把它们看成 “React Server” 和 “React Client”。props 总是从 React Server 流向 React Client，而且它们之间有序列化的边界。React Server 服务器通常运行在构建时间(默认)，或在一个实际的服务器上。React Client 往往运行在两种环境中（浏览器环境它负责管理 DOM，另一个环境则是负责生成初始的 HTML）。
+
+## RSC From Scratch
+
+### 1、[RSC From Scratch. Part 1: Server Components](https://github.com/reactwg/server-components/discussions/5)
+
+
+
 ## Twitter: ask me about rsw
 
 > [ask me anything about React Server Components](https://twitter.com/dan_abramov/status/1631641431742857216)
